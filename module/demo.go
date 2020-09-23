@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	. "github.com/devopsxp/xp/plugin"
+	"github.com/devopsxp/xp/utils"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -31,9 +33,23 @@ func (s *SshCheck) Conn() *Message {
 	}
 
 	fmt.Println("Check target is connect")
+	ip := viper.GetStringSlice("host")
 
+	message := Builder().WithRaw("{'name':'xp'}").WithTarget(ip)
+
+	for _, i := range ip {
+		if utils.ScanPort(i, "22") {
+			fmt.Printf("%s:22 is success\n", i)
+			message.WithStatus(Ok).WithItems(i, "success")
+		} else {
+			fmt.Printf("%s:22 is failed\n", i)
+			message.WithStatus(Error).WithItems(i, "failed")
+		}
+	}
+
+	fmt.Printf("%v\n", message.Build().Data.Items)
 	// 造假数据
-	return Builder().WithRaw("{'name':'xp'}").WithItems("thisis", "world").WithTarget([]string{"127.0.0.1", "192.168.0.1"}).WithStatus(Ok).Build()
+	return message.Build()
 }
 
 func (s *SshCheck) Start() {

@@ -1,11 +1,14 @@
-host: "127.0.0.1"
+host: 
+  - 127.0.0.1
+  - 192.168.50.1
+  - 192.168.50.146
 stage:
   - build
   - test
 config:
   - build:
-      name: 获取go env
-      shell: go env
+      name: 获取go version
+      shell: go version
   - test:
       name: 获取主机名
       shell: "{{range .items}} {{.}} {{end}}"
@@ -16,7 +19,7 @@ config:
       - uname -a
   - test:
       name: 查看docker信息
-      shell: docker info
+      shell: systemctl status sshd
 
   # one:
   #   copy: src={{ base_dir }}/bin/{{ item }} dest={{ bin_dir }}/{{ item }} mode=0755
