@@ -43,14 +43,14 @@ xp is my name,but the project is same like ansible playbook auto ops
 
 # 功能模块
 
-- [*] yaml解析(cobra viper支持)
+- [x] yaml解析(cobra viper支持)
 - [ ] 动态环境变量(cobra支持)
-- [*] with_items迭代器
-- [*] CLI命令行工具(cobra)
+- [x] with_items迭代器
+- [x] CLI命令行工具(cobra)
 - [ ] 功能文件夹，提供：files、hosts、env等特殊目录模块
 - [ ] roles ansible模块
 - [ ] module man模块说明文档
-- [*] module plugin插件机制
+- [x] module plugin插件机制
 
 # Useage
 
@@ -64,3 +64,21 @@ xp is my name,but the project is same like ansible playbook auto ops
 ## 测试执行流程
 
 cli -> main.go -> root.go -> test.go -> pipeline -> init -> start -> check(ssh) -> input(localyaml) -> filter(shell) -> output(console) -> stop
+
+# Module
+
+## Check Plugin
+
+- [x] ssh
+
+## Input Plugin
+
+- [x] localyaml
+
+## Filter Plugin
+
+- [x] shell
+
+## Output Plugin
+
+- [x] console
