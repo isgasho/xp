@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	. "github.com/devopsxp/xp/plugin"
+	"github.com/devopsxp/xp/utils"
 	"github.com/spf13/viper"
 )
 
@@ -21,8 +22,9 @@ func (l *LocalYaml) Get() {
 }
 
 type LocalYamlInput struct {
-	status StatusPlugin
-	yaml   LocalYaml
+	status     StatusPlugin
+	yaml       LocalYaml
+	connecheck map[string]string
 }
 
 func (l *LocalYamlInput) Receive() *Message {
@@ -32,12 +34,23 @@ func (l *LocalYamlInput) Receive() *Message {
 		return nil
 	}
 
-	return Builder().WithItemInterface(l.yaml.data).Build()
+	return Builder().WithCheck(l.connecheck).WithItemInterface(l.yaml.data).Build()
 }
 
 func (l *LocalYamlInput) Start() {
 	l.status = Started
 	fmt.Println("LocalYamlInput plugin started.")
+
+	// Check machine connecting
+	ip := viper.GetStringSlice("host")
+
+	for _, i := range ip {
+		if utils.ScanPort(i, "22") {
+			l.connecheck[i] = "success"
+		} else {
+			l.connecheck[i] = "failed"
+		}
+	}
 }
 
 func (l *LocalYamlInput) Stop() {
@@ -52,4 +65,5 @@ func (l *LocalYamlInput) Status() StatusPlugin {
 // LocalYamlInput的Init函数实现
 func (l *LocalYamlInput) Init() {
 	l.yaml.data = make(map[string]interface{})
+	l.connecheck = make(map[string]string)
 }

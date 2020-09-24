@@ -51,6 +51,7 @@ xp is my name,but the project is same like ansible playbook auto ops
 - [ ] roles ansible模块
 - [ ] module man模块说明文档
 - [x] module plugin插件机制
+- [ ] ssh [连接功能](https://github.com/mojocn/felix)
 
 # Useage
 

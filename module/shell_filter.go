@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/devopsxp/gateway/utils"
 	. "github.com/devopsxp/xp/plugin"
+	"github.com/devopsxp/xp/utils"
 )
 
 func init() {
@@ -25,39 +25,46 @@ func (s *ShellFilter) Process(msgs *Message) *Message {
 	}
 
 	// 解析yaml结果
+	fmt.Printf("%v\n", msgs.Data.Check)
 	// 1. 解析stage步骤
 	stage := msgs.Data.Items["stage"].([]interface{})
 	fmt.Printf("%v\n", stage)
 	config := msgs.Data.Items["config"].([]interface{})
 	fmt.Printf("%v\n", config)
 	// 2. 根据stage进行解析
-	for _, host := range msgs.Data.Items["host"].([]interface{}) {
-		fmt.Printf("执行目标主机： %s\n", host.(string))
-		for _, x := range stage {
-			for _, y := range config {
-				tmp := y.(map[interface{}]interface{})
-				if d, ok := tmp[x.(string)]; ok {
-					tmp_d := d.(map[interface{}]interface{})
-					if items, ok2 := tmp_d["with_items"]; !ok2 {
-						rs, err := utils.ExecCommandString(d.(map[interface{}]interface{})["shell"].(string))
-						if err != nil {
-							fmt.Printf("Stage: %s Name: %s Shell: %s \nResult: %s \n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), err.Error())
-						} else {
-							fmt.Printf("Stage: %s Name: %s Shell: %s \nResult: %s \n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), rs)
-						}
-					} else {
-						for _, xx := range items.([]interface{}) {
-							cmd2, err := utils.ApplyTemplate(d.(map[interface{}]interface{})["shell"].(string), map[string]interface{}{"items": []string{xx.(string)}})
+	for host, status := range msgs.Data.Check {
+		if status == "failed" {
+			fmt.Printf("host %s is failed, next.\n", host)
+		} else {
+			fmt.Printf("执行目标主机： %s\n", host)
+			for _, x := range stage {
+				for _, y := range config {
+					tmp := y.(map[interface{}]interface{})
+					if d, ok := tmp[x.(string)]; ok {
+						tmp_d := d.(map[interface{}]interface{})
+						if items, ok2 := tmp_d["with_items"]; !ok2 {
+							// rs, err := utils.ExecCommandString(d.(map[interface{}]interface{})["shell"].(string))
+							rs, err := utils.New(host, "root", "", 22).Run(d.(map[interface{}]interface{})["shell"].(string))
 							if err != nil {
-								fmt.Println("cmd2 ", cmd2)
-								panic(err)
-							}
-							fmt.Println("cmd2 ", cmd2)
-							rs, err := utils.ExecCommandString(cmd2)
-							if err != nil {
-								fmt.Printf("Stage: %s Name: %s Shell: %s With_items: %s \nResult: %s\n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), items, err.Error())
+								fmt.Printf("Stage: %s \nName: %s \nShell: %s \nResult: %s \n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), err.Error())
 							} else {
-								fmt.Printf("Stage: %s Name: %s Shell: %s With_items: %s \nResult: %s\n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), items, rs)
+								fmt.Printf("Stage: %s \nName: %s \nShell: %s \nResult: %s \n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), rs)
+							}
+						} else {
+							for _, xx := range items.([]interface{}) {
+								cmd2, err := utils.ApplyTemplate(d.(map[interface{}]interface{})["shell"].(string), map[string]interface{}{"items": []string{xx.(string)}})
+								if err != nil {
+									fmt.Println("cmd2 ", cmd2)
+									panic(err)
+								}
+								fmt.Println("cmd2 ", cmd2)
+								// rs, err := utils.ExecCommandString(cmd2)
+								rs, err := utils.New(host, "root", "", 22).Run(cmd2)
+								if err != nil {
+									fmt.Printf("Stage: %s \nName: %s \nShell: %s With_items: %s \nResult: %s\n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), items, err.Error())
+								} else {
+									fmt.Printf("Stage: %s \nName: %s \nShell: %s With_items: %s \nResult: %s\n", x.(string), d.(map[interface{}]interface{})["name"].(string), d.(map[interface{}]interface{})["shell"].(string), items, rs)
+								}
 							}
 						}
 					}

@@ -26,6 +26,7 @@ type SshCheck struct {
 	status StatusPlugin
 }
 
+// 连接目标主机22端口进行测试
 func (s *SshCheck) Conn() *Message {
 	if s.status != Started {
 		fmt.Println("Hello input plugin is not running,input nothing.")
@@ -46,7 +47,7 @@ func (s *SshCheck) Conn() *Message {
 			message.WithStatus(Error).WithItems(i, "failed")
 		}
 	}
-
+	viper.SetDefault("ssh", message.Build().Data.Items)
 	fmt.Printf("%v\n", message.Build().Data.Items)
 	// 造假数据
 	return message.Build()

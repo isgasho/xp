@@ -24,6 +24,7 @@ type Data struct {
 	Raw    string                 `json:"raw"` // 原始文档
 	Items  map[string]interface{} // 详细参数配置
 	Target []string               // 目标服务器
+	Check  map[string]string      // ssh连接检测结果
 }
 
 // Message对象的Builder对象
@@ -46,6 +47,11 @@ func Builder() *builder {
 // 建造者模式
 func (b *builder) WithRaw(info string) *builder {
 	b.msg.Data.Raw = info
+	return b
+}
+
+func (b *builder) WithCheck(data map[string]string) *builder {
+	b.msg.Data.Check = data
 	return b
 }
 

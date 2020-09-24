@@ -25,7 +25,7 @@ import (
 // testCmd represents the test command
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "A brief description of your command",
+	Short: "开发测试模块",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -38,7 +38,6 @@ to quickly create a Cobra application.`,
 
 		// 根据yaml解析shell等模块，进行动态匹配，进行顺序执行
 		config := pipeline.DefaultPipeConfig("shell").
-			WithCheckName("ssh").
 			WithInputName("localyaml").
 			WithFilterName("shell").
 			WithOutputName("console")

@@ -151,7 +151,7 @@ func ScanPort(host, port string) bool {
 	tcpAddr, _ := net.ResolveTCPAddr("tcp4", remote) //转换IP格式 // 根据域名查找ip
 	//fmt.Printf("%s", tcpAddr)
 	// conn, err := net.DialTCP("tcp", nil, tcpAddr) //查看是否连接成功
-	conn, err := net.DialTimeout("tcp", tcpAddr.String(), 500*time.Microsecond) //建立tcp连接
+	conn, err := net.DialTimeout("tcp", tcpAddr.String(), time.Second) //建立tcp连接
 	if err != nil {
 		// fmt.Printf("no==%s:%s\r\n", host, port)
 		return false

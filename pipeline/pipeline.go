@@ -58,9 +58,9 @@ type Pipeline struct {
 
 // 一个消息的处理流程 check -> input -> filter -> output
 func (p *Pipeline) Exec() {
-	msg := p.check.Conn()
+	// msg := p.check.Conn()
+	msg := p.input.Receive()
 	if msg.Status == plugin.Ok {
-		msg = p.input.Receive()
 		msg = p.filter.Process(msg)
 	}
 	p.output.Send(msg)
@@ -71,14 +71,14 @@ func (p *Pipeline) Start() {
 	p.output.Start()
 	p.filter.Start()
 	p.input.Start()
-	p.check.Start()
+	// p.check.Start()
 	p.status = plugin.Started
 	fmt.Println("Pipeline started.")
 }
 
 // 停止的顺序 check -> input -> filter -> output
 func (p *Pipeline) Stop() {
-	p.check.Stop()
+	// p.check.Stop()
 	p.input.Stop()
 	p.filter.Stop()
 	p.output.Stop()
@@ -91,7 +91,7 @@ func (p *Pipeline) Status() plugin.StatusPlugin {
 }
 
 func (p *Pipeline) Init() {
-	p.check.Init()
+	// p.check.Init()
 	p.input.Init()
 	p.filter.Init()
 	p.output.Init()
@@ -110,7 +110,7 @@ func factoryOf(t plugin.PluginType) plugin.Factory {
 // pipeline工厂方法，根据配置创建一个Pipeline实例
 func Of(conf PipeConfig) *Pipeline {
 	p := &Pipeline{}
-	p.check = factoryOf(plugin.CheckType).Create(conf.Check).(plugin.Check)
+	// p.check = factoryOf(plugin.CheckType).Create(conf.Check).(plugin.Check)
 	p.input = factoryOf(plugin.InputType).Create(conf.Input).(plugin.Input)
 	p.filter = factoryOf(plugin.FilterType).Create(conf.Filter).(plugin.Filter)
 	p.output = factoryOf(plugin.OutputType).Create(conf.Output).(plugin.Output)
@@ -119,7 +119,7 @@ func Of(conf PipeConfig) *Pipeline {
 
 // 初始化插件工厂对象
 func init() {
-	pluginFactories[plugin.CheckType] = &plugin.CheckFactory{}
+	// pluginFactories[plugin.CheckType] = &plugin.CheckFactory{}
 	pluginFactories[plugin.InputType] = &plugin.InputFactory{}
 	pluginFactories[plugin.FilterType] = &plugin.FilterFactory{}
 	pluginFactories[plugin.OutputType] = &plugin.OutputFactory{}
